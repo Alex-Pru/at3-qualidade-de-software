@@ -26,7 +26,11 @@ public class LojaService {
         return this.stockList.getLast();
     }
 
-    public double getTotalAmount(List<Product> products, int discount){
+    public static double getTotalAmount(List<Product> products, int discount){
+
+        if(products == null){
+            throw new IllegalArgumentException("Function expects a valid products List");
+        }
 
         if(discount < 0 || discount > 70){
             throw new IllegalArgumentException("The discount may not be less than 0% or more than 70%");
@@ -41,23 +45,21 @@ public class LojaService {
         return sum - sum/100 * discount;
     }
 
-    public List<Product> getProductsInStock(List<Product> productsList){
+    public static List<Product> getProductsInStock(List<Product> productsList){
 
         if (productsList == null) {
             throw new IllegalArgumentException("The product list cannot be null");
         }
 
         if(productsList.isEmpty()){
-            List<Product> products = Collections.emptyList();
-            return products;
+            return productsList;
         }
 
-        List<Product> productsInStock = productsList.stream().filter(product -> product.getStock() > 0).collect(Collectors.toList());
-
-        return productsInStock;
+        return productsList.stream().filter(product -> product.getStock() > 0).collect(Collectors.toList());
     }
 
-    public boolean couponValidation(String coupon){
+    public static boolean couponValidation(String coupon){
+
         if(coupon.length() != 7){
             throw new IllegalArgumentException("Coupon does not have enough characters");
         }
@@ -69,35 +71,32 @@ public class LojaService {
         return true;
     }
 
-    public double[] orderPrices(List<Product> productList){
-        if(productList.isEmpty()){
-            double[] values = {};
-            return values;
-        }
+    public static double[] orderPrices(List<Product> productList){
 
         if(productList == null){
             throw new IllegalArgumentException("Argument must be a list of products");
         }
 
-        double[] orderedPrices = productList
+        if(productList.isEmpty()){
+            return new double[0];
+        }
+
+        return productList
                 .stream()
                 .sorted((product1, product2) -> Double.compare(product2.getPrice(), product1.getPrice()))
                 .mapToDouble(Product::getPrice)
                 .toArray();
-
-        return orderedPrices;
     }
 
-    public String[] checkStock(List<Product> productsList, int limitMin){
+    public static String[] checkStock(List<Product> productsList, int limitMin){
         if(productsList == null || productsList.isEmpty()){
             throw new IllegalArgumentException("A products list is expected");
         }
 
         if(limitMin < 1){
-            throw new IllegalArgumentException("The minimum limit must bigger than 1");
+            throw new IllegalArgumentException("The minimum limit must be more than 1");
         }
 
-        String[] lowStockProducts = productsList.stream().filter(product ->  product.getStock() < limitMin).map(Product::getName).toArray(String[]::new);
-        return lowStockProducts;
+        return productsList.stream().filter(product ->  product.getStock() < limitMin).map(Product::getName).toArray(String[]::new);
     }
 }

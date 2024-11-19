@@ -1,5 +1,7 @@
 package com.service.service;
 
+import java.util.Objects;
+
 public class Product {
     private String name;
     private double price;
@@ -25,5 +27,20 @@ public class Product {
 
     public int getStock(){
         return this.quantityInStock;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Double.compare(product.price, price) == 0 &&
+                quantityInStock == product.quantityInStock &&
+                Objects.equals(name, product.name);
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(name, price, quantityInStock);
     }
 }
